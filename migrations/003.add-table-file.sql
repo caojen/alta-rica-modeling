@@ -3,7 +3,7 @@ create table if not exists `alta`.`file` (
   `name` varchar(64) not null default 'untitled',
   `pid` int(11) not null,
   primary key(`fid`),
-  foreign key(`pid`) references `project`(`pid`)
+  foreign key(`pid`) references `project`(`pid`) on delete cascade
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
