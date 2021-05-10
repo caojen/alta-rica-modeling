@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { FileService } from './file.service';
 
 @Controller('file')
@@ -9,8 +10,14 @@ export class FileController {
   ) {}
 
   @Get(':fid')
-  async getFileContent(@Param() param: { fid: number }) {
-    return this.fileService.getFileContent(param.fid)
+  async getFileContent(@Param() param: { fid: number }, @Res() r: Response) {
+    const res = await this.fileService.getFileContent(param.fid)
+    if(res.ext !== 'png') {
+      r.send(res.buffer.toString());
+    } else {
+      r.setHeader('content-type', 'application/x-png')
+      r.send(res.buffer);
+    }
   }
 
   @Put(':fid/name')

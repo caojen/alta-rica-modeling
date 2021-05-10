@@ -11,7 +11,7 @@ export class FileService {
 
   async getFileContent(fid: number) {
     const sql = `
-      select 1 from file where fid=?;
+      select name from file where fid=?;
     `;
 
     const res = await this.dbService.query(sql, [fid]);
@@ -21,7 +21,14 @@ export class FileService {
       }, 404);
     }
 
-    return this.fsService.getFile(fid);
+    const filename: string = res[0].name;
+
+    const buffer = await this.fsService.getFile(fid);
+
+    return {
+      buffer,
+      ext: filename.substring(filename.length - 3)
+    }
   }
 
   async renameFileName(fid: number, filename: string) {
