@@ -3,6 +3,7 @@ import * as mysql from 'mysql2/promise'
 
 function parse(config: any) {
   config.host = process.env[config.host];
+  config.port = process.env[config.port];
   config.user = process.env[config.user];
   config.database = process.env[config.database];
   config.password = process.env[config.password];
@@ -14,12 +15,13 @@ function parse(config: any) {
 export class DbService {
   private readonly config = {
     host: "MYSQL_HOST",
+    port: "MYSQL_PORT",
     user: "MYSQL_USER",
     database: "MYSQL_DATABASE",
-    password: "MYSQL_DATABASE",
-    multipleStatement: false,
+    password: "MYSQL_PASSWORD",
+    multipleStatements: false,
     connectionLimit: 30,
-    waitForConnection: true,
+    waitForConnections: true,
     queueLimit: 0
   };
 
@@ -27,6 +29,7 @@ export class DbService {
   private readonly logger: Logger = new Logger(DbService.name);
   constructor() {
     this.pool = mysql.createPool(parse(this.config));
+    this.query('select 1 from project;');
   }
 
   async query(sql: string, param: any[] = []) {
