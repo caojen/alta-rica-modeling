@@ -58,6 +58,24 @@ export class GenerateService {
     await this.dbService.query(sql, [pid]);
   }
 
+  async deleteOPSA(pid: number) {
+    const sql = `
+      delete from file
+      where pid = ? and name like '%opsa';
+    `;
+
+    await this.dbService.query(sql, [pid]);
+  }
+
+  async deleteFaultTree(pid: number) {
+    const sql = `
+      delete from file
+      where pid = ? and name like '%fault-tree.png';
+    `;
+
+    await this.dbService.query(sql, [pid]);
+  }
+
   async getALTFileId(pid: number): Promise<number> {
     const sql = `
       select fid
@@ -118,12 +136,14 @@ export class GenerateService {
     fs.writeFileSync(edgefile, `graph TD\n${edges}`);
     const pngfile = `tmp/${tmpfile}-3`;
     this.edge2png(edgefile, pngfile);
+
     // if exists model.png file, then delete this file
     await this.deleteModelPNG(pid);
     res = await this.dbService.query(sql, ['model.png', pid]);
     const png_id = res.insertId;
     this.fsService.createFile(png_id);
     fs.copyFileSync(pngfile, `storage/${png_id}`);
+    
     ret.push({
       fid: png_id,
       name: 'model.png'
@@ -132,6 +152,61 @@ export class GenerateService {
   }
 
   async generateTree(pid: number) {
-    
+    const fid = await this.getALTFileId(pid);
+    if(fid === -1) {
+      throw new HttpException({
+        msg: '没有找到alt文件'
+      }, 406);
+    }
+    const ar3c = this.getGTSPath('ar3c.exe');
+    const tmpfile = this.getRandomString();
+    const gtsfile = `tmp/${tmpfile}-1`;
+    const ret = [];
+    this.commandService.run(ar3c, [`storage/${fid}`, '--gts-xml', gtsfile]);
+    // if exists gts file, then, delete that gts file
+    await this.deleteGTS(pid);
+    // create this file
+    const sql = `
+      insert into file(name, pid)
+      values(?, ?);
+    `;
+    let res = await this.dbService.query(sql, ['gts.gts', pid]);
+    const gts_id = res.insertId;
+    fs.copyFileSync(gtsfile, `storage/${gts_id}`);
+    ret.push({
+      fid: gts_id,
+      name: 'gts.gts'
+    });
+
+    const opsa = this.getGTSPath('gtsftc.exe');
+    const opsafile = `tmp/${tmpfile}-2`;
+    this.commandService.run(opsa, [gtsfile, '--print-xml', opsafile]);
+    // if exists opsa file, hten, delete it
+    await this.deleteOPSA(pid);
+    // create opsa file
+    res = await this.dbService.query(sql, ['opsa.opsa', pid]);
+    const opsa_id = res.insertId;
+    fs.copyFileSync(opsafile, `storage/${opsa_id}`);
+    ret.push({
+      fid: opsa_id,
+      name: 'opsa.opsa'
+    });
+
+    const edgefile = `tmp/${tmpfile}-3`;
+    const opsa2pic = this.getPythonPath('opsa-pic.py');
+    const edges = this.commandService.run('python', [opsa2pic, opsafile]);
+    fs.writeFileSync(edgefile, `graph TD\n${edges}`);
+    const pngfile = `tmp/${tmpfile}-4`;
+    this.edge2png(edgefile, pngfile);
+    await this.deleteFaultTree(pid);
+    res = await this.dbService.query(sql, ['fault-tree.png', pid]);
+    const png_id = res.insertId;
+    fs.copyFileSync(pngfile, `storage/${png_id}`);
+    ret.push({
+      fid: png_id,
+      name: 'fault-tree.png'
+    })
+
+    return ret;
   }
 }

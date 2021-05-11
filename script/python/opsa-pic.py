@@ -95,11 +95,14 @@ def output(fault_trees,first):
             #print("substrees==False  此时key=",key,"  value=",value)
             continue
 
+import sys
+
 if __name__ == "__main__":  
       
     #1. 读取xml文件  
     #./表示当前目录，或者不用，直接当前目录下文件名
-    tree = read_xml("./acs.opsa")
+    filename = sys.argv[1]
+    tree = read_xml(filename)
     #write_xml(tree, "./out.xml")
     #A. 找到父节点  
     nodes1 = find_nodes(tree, "define-gate")

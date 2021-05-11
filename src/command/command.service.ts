@@ -6,7 +6,6 @@ import * as process from 'process';
 @Injectable()
 export class CommandService {
   run(command: string, args?: string[]): string {
-    console.log(command, args);
     const p = child_process.spawnSync(command, args);
     if(p.error) {
       throw new HttpException({
