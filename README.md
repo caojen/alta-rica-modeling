@@ -8,6 +8,11 @@ python: 3.7.8
 nest: 7.5.1
 ```
 
+## Install
+```
+npm install
+```
+
 ## Run
 ```
 npm run start:dev
