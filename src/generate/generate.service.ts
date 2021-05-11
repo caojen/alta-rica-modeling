@@ -19,4 +19,12 @@ export class GenerateService {
     // console.log(this.commandService.run('python', [this.getPythonPath('gts-to-pic.py'), './tmp/acs.gts']));
     return ''
   }
+
+  async generateModel(pid: number) {
+
+  }
+
+  async generateTree(pid: number) {
+    
+  }
 }
