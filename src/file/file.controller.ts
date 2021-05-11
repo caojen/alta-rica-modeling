@@ -15,7 +15,7 @@ export class FileController {
     if(res.ext !== 'png') {
       r.send(res.buffer.toString());
     } else {
-      r.setHeader('content-type', 'application/x-png')
+      r.setHeader('Content-Type', 'image/png')
       r.send(res.buffer);
     }
   }

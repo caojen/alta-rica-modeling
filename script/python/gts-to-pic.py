@@ -45,9 +45,9 @@ import sys
 if __name__ == "__main__":  
       
     #1. 读取xml文件
-    print(sys.argv)
+    # print(sys.argv)
     filename = sys.argv[1]   # receive filename from args
-    print(filename)
+    # print(filename)
     tree = read_xml(filename)
     #A. 找到父节点  
     nodes1 = find_nodes(tree, "define-block/assertion/assignment") 
