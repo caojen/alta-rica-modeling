@@ -11,5 +11,10 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true
-  }
+  },
+  "exclude": [
+    "static",
+    "storage",
+    "tmp"
+  ]
 }
