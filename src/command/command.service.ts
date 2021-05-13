@@ -9,7 +9,7 @@ export class CommandService {
     const p = child_process.spawnSync(command, args);
     if(p.status !== 0 || p.error || p.stderr.length > 0) {
       throw new HttpException({
-        msg: '执行命令出错',
+        msg: `执行命令出错, 出错信息:\n${p.stdout.toString()}`,
         e: p.error,
         command,
         args,
