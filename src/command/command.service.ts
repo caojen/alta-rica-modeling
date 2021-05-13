@@ -14,7 +14,8 @@ export class CommandService {
         command,
         args,
         stdout: p.stdout.toString(),
-        stderr: p.stderr.toString()
+        stderr: p.stderr.toString(),
+        status: false
       }, 200);
     } else {
       return p.stdout?.toString();

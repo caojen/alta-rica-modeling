@@ -148,7 +148,11 @@ export class GenerateService {
       fid: png_id,
       name: 'model.png'
     });
-    return ret;
+    return {
+      status: true,
+      msg: '生成成功',
+      files: ret
+    };
   }
 
   async generateTree(pid: number) {
@@ -207,6 +211,10 @@ export class GenerateService {
       name: 'fault-tree.png'
     })
 
-    return ret;
+    return {
+      status: true,
+      msg: '生成成功',
+      files: ret
+    };
   }
 }
